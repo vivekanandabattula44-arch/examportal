@@ -106,11 +106,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenZ
 
             <button
               onClick={onOpenZipModal}
-              className="flex items-center space-x-1.5 px-3 py-2 text-xs font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700 rounded-lg transition-all"
-              title="Download offline exam ZIP folder"
+              className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 rounded-lg shadow-sm transition-all"
+              title="Download all in single ZIP file"
             >
-              <Download className="w-3.5 h-3.5 text-sky-400" />
-              <span>ZIP Folder</span>
+              <Download className="w-3.5 h-3.5" />
+              <span>Single ZIP File</span>
             </button>
           </nav>
 

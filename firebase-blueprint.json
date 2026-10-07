@@ -1,0 +1,197 @@
+{
+  "entities": {
+    "Admin": {
+      "title": "Admin",
+      "description": "System administrator with management privileges",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Administrator email address"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin"],
+          "description": "Role string"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when admin was registered"
+        }
+      },
+      "required": ["email", "role"]
+    },
+    "Question": {
+      "title": "Question",
+      "description": "Examination question across Java, Data Structures, Python Basics, and General Knowledge",
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": ["Java", "Data Structures", "Python Basics", "General Knowledge"],
+          "description": "Subject category"
+        },
+        "questionText": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "The question statement"
+        },
+        "codeSnippet": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Optional code snippet or program logic"
+        },
+        "options": {
+          "type": "array",
+          "description": "Multiple choice options"
+        },
+        "correctOptionIndex": {
+          "type": "number",
+          "description": "Index of the correct answer (0-3)"
+        },
+        "explanation": {
+          "type": "string",
+          "maxLength": 1500,
+          "description": "Detailed solution or explanation"
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": ["Easy", "Medium", "Hard"],
+          "description": "Question difficulty level"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "UID of the admin creator"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["category", "questionText", "options", "correctOptionIndex", "difficulty", "createdBy"]
+    },
+    "Submission": {
+      "title": "Submission",
+      "description": "Student exam attempt and score result record",
+      "type": "object",
+      "properties": {
+        "studentId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the student"
+        },
+        "studentEmail": {
+          "type": "string",
+          "description": "Student email address"
+        },
+        "studentName": {
+          "type": "string",
+          "description": "Student display name"
+        },
+        "category": {
+          "type": "string",
+          "description": "Subject category or Comprehensive"
+        },
+        "totalQuestions": {
+          "type": "number",
+          "description": "Total number of questions in test"
+        },
+        "timeLimitMinutes": {
+          "type": "number",
+          "description": "Time limit allocated in minutes"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["in_progress", "submitted", "timed_out"],
+          "description": "Status of the exam session"
+        },
+        "score": {
+          "type": "number",
+          "description": "Points scored"
+        },
+        "percentage": {
+          "type": "number",
+          "description": "Percentage score (0-100)"
+        },
+        "passed": {
+          "type": "boolean",
+          "description": "Whether passing threshold was met"
+        },
+        "answers": {
+          "type": "object",
+          "description": "Map of questionId to selected option index"
+        },
+        "startedAt": {
+          "type": "string",
+          "description": "Timestamp when exam commenced"
+        },
+        "submittedAt": {
+          "type": "string",
+          "description": "Timestamp when exam was submitted"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Record creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Record update timestamp"
+        }
+      },
+      "required": ["studentId", "category", "totalQuestions", "timeLimitMinutes", "status"]
+    },
+    "Resource": {
+      "title": "Resource",
+      "description": "Curated learning resource or tutorial link",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Title of the tutorial or resource"
+        },
+        "channel": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Channel name (Jenny's Lectures, Shradha Khapra, Apna College, etc.)"
+        },
+        "url": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "YouTube or resource URL"
+        },
+        "category": {
+          "type": "string",
+          "description": "Relevant category"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Brief description of what is taught"
+        }
+      },
+      "required": ["title", "channel", "url", "category"]
+    }
+  },
+  "firestore": {
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Collection of authorized administrators"
+    },
+    "/questions/{questionId}": {
+      "schema": "Question",
+      "description": "Exam questions created by admins"
+    },
+    "/submissions/{submissionId}": {
+      "schema": "Submission",
+      "description": "Student exam attempts, answers, and graded results"
+    },
+    "/resources/{resourceId}": {
+      "schema": "Resource",
+      "description": "Learning video and guide resources"
+    }
+  }
+}

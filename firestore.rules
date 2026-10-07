@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isBootstrappedAdmin() {
+      return isSignedIn() && request.auth.token.email == 'battulavivekananda07@gmail.com';
+    }
+
+    function isAdmin() {
+      return isBootstrappedAdmin() || (isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isValidQuestion(data) {
+      return data.category in ['Java', 'Data Structures', 'Python Basics', 'General Knowledge']
+        && data.questionText is string && data.questionText.size() > 0 && data.questionText.size() <= 1000
+        && (!('codeSnippet' in data) || (data.codeSnippet is string && data.codeSnippet.size() <= 2000))
+        && data.options is list && data.options.size() >= 2 && data.options.size() <= 6
+        && data.correctOptionIndex is number && data.correctOptionIndex >= 0 && data.correctOptionIndex < 6
+        && (!('explanation' in data) || (data.explanation is string && data.explanation.size() <= 1500))
+        && data.difficulty in ['Easy', 'Medium', 'Hard']
+        && data.createdBy is string && data.createdBy.size() <= 128;
+    }
+
+    // Admins registry
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() && isValidId(adminId);
+    }
+
+    // Questions pool
+    match /questions/{questionId} {
+      allow read: if isSignedIn();
+      allow create: if isAdmin() && isValidId(questionId) && isValidQuestion(incoming());
+      allow update: if isAdmin() && isValidId(questionId) && isValidQuestion(incoming());
+      allow delete: if isAdmin() && isValidId(questionId);
+    }
+
+    // Student Exam Submissions & Scores
+    match /submissions/{submissionId} {
+      allow read: if isSignedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
+      
+      allow create: if isSignedIn()
+        && isValidId(submissionId)
+        && incoming().studentId == request.auth.uid
+        && incoming().status == 'in_progress'
+        && incoming().totalQuestions is number
+        && incoming().timeLimitMinutes is number;
+
+      allow update: if isSignedIn() && isValidId(submissionId) && (
+        isAdmin() || (
+          existing().studentId == request.auth.uid &&
+          existing().status == 'in_progress' &&
+          incoming().studentId == request.auth.uid &&
+          (incoming().status in ['in_progress', 'submitted', 'timed_out'])
+        )
+      );
+
+      allow delete: if isAdmin() && isValidId(submissionId);
+    }
+
+    // Curated learning video & course resources
+    match /resources/{resourceId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() && isValidId(resourceId);
+    }
+  }
+}

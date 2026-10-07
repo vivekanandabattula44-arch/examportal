@@ -1,0 +1,6 @@
+{
+  "name": "SkillTest Examination Portal",
+  "description": "Mobile & desktop responsive exam application for students and admins with timed tests in Java, Data Structures, Python, and General Knowledge, automated grading, results tracking, and curated learning resources.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
